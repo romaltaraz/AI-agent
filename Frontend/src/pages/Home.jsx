@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Menu } from "lucide-react";
 import { deleteConversation } from "../api";
 import useChat from "../hooks/useChat";
 import useConversationList from "../hooks/useConversationList";
@@ -17,6 +18,27 @@ export default function Home() {
   const [toDelete, setToDelete] = useState(null); // the conversation waiting for a yes/no
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+
+  // The sidebar drawer (phones only; on a wide screen the sidebar is always visible)
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const closeOnEscape = (event) => event.key === "Escape" && setDrawerOpen(false);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [drawerOpen]);
+
+  // Starting or opening a chat from the drawer also closes the drawer.
+  function startNewChat() {
+    chat.startNewChat();
+    setDrawerOpen(false);
+  }
+
+  function openConversation(id) {
+    chat.openConversation(id);
+    setDrawerOpen(false);
+  }
 
   async function confirmDelete() {
     setDeleting(true);
@@ -51,12 +73,21 @@ export default function Home() {
         onSearch={list.setSearch}
         error={list.error}
         disabled={chat.sending} // switching chats while an answer is loading would mix them up
-        onNewChat={chat.startNewChat}
-        onSelect={chat.openConversation}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onNewChat={startNewChat}
+        onSelect={openConversation}
         onDelete={setToDelete}
       />
+      {drawerOpen && <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />}
 
       <div className="chat-page">
+        <div className="chat-topbar">
+          <button aria-label="פתיחת רשימת השיחות" aria-expanded={drawerOpen} onClick={() => setDrawerOpen(true)}>
+            <Menu size={20} />
+            <span>השיחות שלי</span>
+          </button>
+        </div>
         {chat.messages.length === 0 ? (
           <Welcome onPick={chat.send} disabled={chat.sending} />
         ) : (

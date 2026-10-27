@@ -4,6 +4,13 @@
   --primary-hover: #096b68;
   --accent: #14b8a6;
   --primary-soft: #e3f5f3;
+  /* Calm complementary pastels (used for icon backgrounds and decorations) */
+  --sky-soft: #e8f2fb;
+  --sky: #a9cce8;
+  --sky-ink: #3d6f9a;
+  --lavender-soft: #eeebfa;
+  --lavender: #cfc6ee;
+  --lavender-ink: #6a5fa8;
   --bg: #f4faf9;
   --surface: #ffffff;
   --text: #1c2b33;
@@ -28,9 +35,21 @@ body,
 }
 
 body {
-  background: var(--bg);
+  background: var(--bg) linear-gradient(180deg, #f4faf9 0%, #f6f8fd 100%) fixed;
   color: var(--text);
   line-height: 1.6;
+}
+
+/* People who prefer less motion get no animations or transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 button,
@@ -64,4 +83,24 @@ button:disabled {
   min-height: 0; /* lets the chat scroll inside instead of growing the page */
   display: flex;
   flex-direction: column;
+}
+
+/* Soft color "tones" for icon badges, shared by the welcome screen and the About page */
+.tone-teal {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.tone-sky {
+  background: var(--sky-soft);
+  color: var(--sky-ink);
+}
+.tone-lavender {
+  background: var(--lavender-soft);
+  color: var(--lavender-ink);
+}
+
+/* Gentle floating motion for the illustrations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }

@@ -5,39 +5,40 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
+  padding: 16px 16px 24px;
   text-align: center;
 }
 
-.welcome-icon {
-  display: grid;
-  place-items: center;
-  width: 68px;
-  height: 68px;
-  margin-bottom: 12px;
-  border-radius: 50%;
-  background: var(--primary-soft);
-  color: var(--primary);
+.welcome-illustration {
+  width: auto;
+  max-width: min(300px, 80%);
+  max-height: 210px;
+  margin-bottom: 8px;
+  animation: float 6s ease-in-out infinite;
 }
 
 .welcome h1 {
   margin: 0 0 4px;
   font-size: 1.8rem;
+  color: var(--text);
 }
 
 .welcome p {
-  margin: 0 0 20px;
+  margin: 0 0 22px;
   color: var(--muted);
 }
 
 .welcome-prompts {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  width: min(640px, 100%);
+  gap: 12px;
+  width: min(660px, 100%);
 }
 
-.welcome-prompts button {
+.prompt-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 14px 16px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -45,16 +46,40 @@
   color: var(--text);
   text-align: start;
   box-shadow: var(--shadow);
-  transition: border-color 0.15s, transform 0.15s;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
-.welcome-prompts button:hover:not(:disabled) {
+.prompt-card:hover:not(:disabled) {
   border-color: var(--accent);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(11, 127, 123, 0.12);
+}
+
+.prompt-icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.prompt-text {
+  line-height: 1.4;
 }
 
 @media (max-width: 600px) {
+  .welcome {
+    justify-content: flex-start;
+  }
+  .welcome-illustration {
+    max-height: 150px;
+  }
+  .welcome h1 {
+    font-size: 1.5rem;
+  }
   .welcome-prompts {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 }

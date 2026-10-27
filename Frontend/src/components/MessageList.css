@@ -56,25 +56,21 @@
   white-space: normal; /* Markdown creates its own paragraphs */
 }
 
-/* Basic Markdown spacing (full formatting comes in a later phase) */
-.message-bubble > :first-child {
-  margin-top: 0;
+/* A new message fades in softly (Markdown formatting lives in Markdown.css) */
+.message {
+  animation: rise 0.25s ease-out;
 }
-.message-bubble > :last-child {
-  margin-bottom: 0;
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
 }
 
-/* Code is always left-to-right, even in a Hebrew page */
-.message-bubble pre,
-.message-bubble code {
-  direction: ltr;
-  text-align: left;
+/* An answer with a code block should be allowed to use the full width */
+.message-assistant .message-body:has(.code-block) {
+  width: min(680px, calc(100% - 50px));
 }
-.message-bubble pre {
-  overflow-x: auto;
-  padding: 12px;
-  border-radius: 10px;
-  background: #f0f5f5;
+.message-assistant .message-body:has(.code-block) .message-bubble {
+  width: 100%;
 }
 
 /* "AI is typing" dots */

@@ -1,6 +1,8 @@
-import { Search, SquarePen, Trash2 } from "lucide-react";
+import { Search, SquarePen, Trash2, X } from "lucide-react";
 import "./Sidebar.css";
 
+// On a wide screen this is a fixed column. On a phone it is a drawer that slides in
+// when "open" is true (see Sidebar.css).
 export default function Sidebar({
   conversations,
   activeId,
@@ -8,6 +10,8 @@ export default function Sidebar({
   onSearch,
   error,
   disabled,
+  open,
+  onClose,
   onNewChat,
   onSelect,
   onDelete,
@@ -18,11 +22,16 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="sidebar">
-      <button className="new-chat-button" disabled={disabled} onClick={onNewChat}>
-        <SquarePen size={18} />
-        שיחה חדשה
-      </button>
+    <aside className={open ? "sidebar open" : "sidebar"} aria-label="השיחות שלי">
+      <div className="sidebar-top">
+        <button className="new-chat-button" disabled={disabled} onClick={onNewChat}>
+          <SquarePen size={18} />
+          שיחה חדשה
+        </button>
+        <button className="drawer-close" aria-label="סגירת התפריט" onClick={onClose}>
+          <X size={20} />
+        </button>
+      </div>
 
       <div className="sidebar-search">
         <Search size={16} />

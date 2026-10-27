@@ -10,7 +10,23 @@
   overflow-y: auto;
 }
 
+.sidebar-top {
+  display: flex;
+  gap: 8px;
+}
+
+.drawer-close {
+  display: none; /* only shown inside the mobile drawer */
+  place-items: center;
+  width: 42px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
 .new-chat-button {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -124,4 +140,29 @@
 
 .sidebar-error {
   color: var(--danger);
+}
+
+/* ---------- Phone: the sidebar becomes a drawer that slides in from the right ---------- */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0; /* start = the right edge in a right-to-left page */
+    z-index: 60;
+    width: min(320px, 86vw);
+    box-shadow: -8px 0 30px rgba(11, 127, 123, 0.18);
+    transform: translateX(100%); /* parked off-screen to the right */
+    visibility: hidden; /* hidden drawer cannot be reached with the Tab key */
+    transition: transform 0.22s ease, visibility 0s linear 0.22s;
+  }
+
+  .sidebar.open {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.22s ease;
+  }
+
+  .drawer-close {
+    display: grid;
+  }
 }

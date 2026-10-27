@@ -1,7 +1,7 @@
 import { useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { Bot, Pencil, RefreshCw, User } from "lucide-react";
 import { MAX_MESSAGE_LENGTH } from "../config";
+import Markdown from "./Markdown";
 import "./Message.css";
 
 // One message bubble. The buttons under it appear only when the parent says so:
@@ -44,9 +44,10 @@ export default function Message({ message, canEdit, canRegenerate, busy, onEdit,
             </div>
           </div>
         ) : (
-          // dir="auto" lets mixed Hebrew / English text display in the right direction
-          <div className="message-bubble" dir="auto">
-            {isUser ? message.content : <ReactMarkdown>{message.content}</ReactMarkdown>}
+          // User text is one block, so dir="auto" on the bubble is enough. For an answer,
+          // <Markdown> sets dir="auto" on every paragraph and list item separately.
+          <div className="message-bubble" dir={isUser ? "auto" : undefined}>
+            {isUser ? message.content : <Markdown>{message.content}</Markdown>}
           </div>
         )}
 

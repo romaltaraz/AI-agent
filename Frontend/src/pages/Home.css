@@ -18,9 +18,42 @@
   margin: 0 auto 8px;
 }
 
-/* TODO (Phase 6): replace this with a menu button + sidebar drawer. */
+/* The menu button and the dark background behind the drawer exist on phones only. */
+.chat-topbar,
+.drawer-backdrop {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  .sidebar {
-    display: none;
+  .chat-topbar {
+    display: flex;
+    padding: 8px 12px;
   }
+
+  .chat-topbar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--primary);
+    font-weight: 500;
+    box-shadow: var(--shadow);
+  }
+
+  .drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(28, 43, 51, 0.4);
+    animation: fade 0.2s ease-out;
+  }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

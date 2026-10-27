@@ -1,5 +1,5 @@
 // The application name lives here only - change it in one place.
-export const APP_NAME = "צ'אט חכם";
+export const APP_NAME = "צ'אט-לי";
 
 // Address of the FastAPI backend. Normally this default is used; the optional
 // VITE_API_URL setting only exists so a second copy can be run on another port.
