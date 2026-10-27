@@ -1,0 +1,71 @@
+/* The bubble and the small action buttons under it */
+.message-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* start = the right side in RTL */
+  gap: 4px;
+  min-width: 0;
+  max-width: min(680px, calc(100% - 50px));
+}
+
+.message-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.85rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+.message-action:hover:not(:disabled) {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* Editing the latest user message */
+.message-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(560px, 100%);
+}
+
+.message-editor textarea {
+  padding: 10px 14px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
+}
+
+.message-editor-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.message-editor-actions button {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+}
+
+.editor-save {
+  background: var(--primary);
+  color: #fff;
+}
+
+.editor-save:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.editor-cancel {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}

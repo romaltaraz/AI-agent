@@ -30,7 +30,7 @@
 }
 
 .message-bubble {
-  max-width: min(680px, calc(100% - 50px));
+  max-width: 100%;
   padding: 10px 16px;
   border-radius: var(--radius);
   overflow-wrap: anywhere;
@@ -102,10 +102,24 @@
 }
 
 .chat-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   margin: 0;
   padding: 10px 14px;
   border-radius: 12px;
   background: var(--danger-soft);
   color: var(--danger);
   border: 1px solid #efc9c6;
+}
+
+.retry-button {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-weight: 600;
 }

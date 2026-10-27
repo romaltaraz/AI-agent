@@ -1,0 +1,29 @@
+.style-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: min(800px, 100%);
+  margin: 0 auto 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.style-option {
+  padding: 3px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.style-option:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.style-option.selected {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}

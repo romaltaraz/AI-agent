@@ -8,12 +8,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from database import get_connection
+from message_routes import router as message_router
 from routes import router
 
 load_dotenv()
 
 app = FastAPI(title="Hebrew AI Chat API")
 app.include_router(router)
+app.include_router(message_router)
 
 
 @app.exception_handler(mysql.connector.Error)

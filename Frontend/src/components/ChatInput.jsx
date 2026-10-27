@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 import { SendHorizontal } from "lucide-react";
 import { MAX_MESSAGE_LENGTH } from "../config";
+import StyleSelector from "./StyleSelector";
 import "./ChatInput.css";
 
-export default function ChatInput({ value, onChange, onSend, disabled }) {
+export default function ChatInput({ value, onChange, onSend, disabled, style, onStyleChange }) {
   const textareaRef = useRef(null);
 
   // Grow the box with the text (up to the max height set in the CSS).
@@ -23,6 +24,7 @@ export default function ChatInput({ value, onChange, onSend, disabled }) {
 
   return (
     <div className="chat-input-wrap">
+      <StyleSelector value={style} onChange={onStyleChange} disabled={disabled} />
       <div className="chat-input">
         <textarea
           ref={textareaRef}

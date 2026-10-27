@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from database import get_connection
 
 CONTEXT_LIMIT = 30  # how many recent messages are sent to the AI
+DEFAULT_TITLE = "שיחה חדשה"  # must match the default in Database/schema.sql
 
 
 @contextmanager
@@ -34,9 +35,9 @@ def list_conversations(search=""):
         return cursor.fetchall()
 
 
-def create_conversation():
+def create_conversation(response_style="detailed"):
     with _cursor() as cursor:
-        cursor.execute("INSERT INTO conversations () VALUES ()")  # all columns have defaults
+        cursor.execute("INSERT INTO conversations (response_style) VALUES (%s)", (response_style,))
         cursor.execute("SELECT * FROM conversations WHERE id = %s", (cursor.lastrowid,))
         return cursor.fetchone()
 
@@ -72,33 +73,108 @@ def get_last_message(conversation_id):
         return cursor.fetchone()
 
 
-def get_recent_messages(conversation_id):
-    """The latest 30 messages of this conversation only, oldest first."""
+def get_last_user_message(conversation_id):
+    with _cursor() as cursor:
+        cursor.execute(
+            "SELECT id, role, content, created_at FROM messages "
+            "WHERE conversation_id = %s AND role = 'user' ORDER BY id DESC LIMIT 1",
+            (conversation_id,),
+        )
+        return cursor.fetchone()
+
+
+def get_first_user_message(conversation_id):
+    with _cursor() as cursor:
+        cursor.execute(
+            "SELECT id, role, content, created_at FROM messages "
+            "WHERE conversation_id = %s AND role = 'user' ORDER BY id LIMIT 1",
+            (conversation_id,),
+        )
+        return cursor.fetchone()
+
+
+def count_assistant_messages(conversation_id):
+    with _cursor() as cursor:
+        cursor.execute(
+            "SELECT COUNT(*) AS total FROM messages WHERE conversation_id = %s AND role = 'assistant'",
+            (conversation_id,),
+        )
+        return cursor.fetchone()["total"]
+
+
+def get_recent_messages(conversation_id, before_id=None):
+    """The latest 30 messages of this conversation only, oldest first.
+    With before_id, only messages older than that id are used (this is how
+    "regenerate" leaves the old answer out of the context)."""
+    newest_allowed = before_id if before_id is not None else 2**31 - 1
     with _cursor() as cursor:
         cursor.execute(
             "SELECT role, content FROM ("
             "  SELECT id, role, content FROM messages "
-            "  WHERE conversation_id = %s ORDER BY id DESC LIMIT %s"
+            "  WHERE conversation_id = %s AND id < %s ORDER BY id DESC LIMIT %s"
             ") AS recent ORDER BY id",
-            (conversation_id, CONTEXT_LIMIT),
+            (conversation_id, newest_allowed, CONTEXT_LIMIT),
         )
         return cursor.fetchall()
 
 
+def _insert_message(cursor, conversation_id, role, content):
+    """Insert a message and bump updated_at (sidebar order), inside the caller's transaction."""
+    cursor.execute(
+        "INSERT INTO messages (conversation_id, role, content) VALUES (%s, %s, %s)",
+        (conversation_id, role, content),
+    )
+    message_id = cursor.lastrowid
+    cursor.execute(
+        "UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = %s",
+        (conversation_id,),
+    )
+    cursor.execute(
+        "SELECT id, role, content, created_at FROM messages WHERE id = %s",
+        (message_id,),
+    )
+    return cursor.fetchone()
+
+
 def add_message(conversation_id, role, content):
-    """Save a message and bump the conversation's updated_at (sidebar order)."""
+    with _cursor() as cursor:
+        return _insert_message(cursor, conversation_id, role, content)
+
+
+def replace_assistant_message(conversation_id, old_id, content):
+    """Regenerate: delete the old answer and save the new one in ONE transaction.
+    Returns None if the old answer no longer exists (someone else already replaced it)."""
     with _cursor() as cursor:
         cursor.execute(
-            "INSERT INTO messages (conversation_id, role, content) VALUES (%s, %s, %s)",
-            (conversation_id, role, content),
+            "DELETE FROM messages WHERE id = %s AND conversation_id = %s AND role = 'assistant'",
+            (old_id, conversation_id),
         )
-        message_id = cursor.lastrowid
+        if cursor.rowcount == 0:
+            return None
+        return _insert_message(cursor, conversation_id, "assistant", content)
+
+
+def replace_last_user_message(conversation_id, target_id, content):
+    """Edit: delete the user message and everything after it (its answer), then save
+    the edited text as a new message. One transaction, so nothing is left half-done."""
+    with _cursor() as cursor:
         cursor.execute(
-            "UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = %s",
-            (conversation_id,),
+            "DELETE FROM messages WHERE conversation_id = %s AND id >= %s",
+            (conversation_id, target_id),
         )
+        return _insert_message(cursor, conversation_id, "user", content)
+
+
+def set_title(conversation_id, title):
+    with _cursor() as cursor:
+        cursor.execute("UPDATE conversations SET title = %s WHERE id = %s", (title, conversation_id))
+
+
+def set_style(conversation_id, response_style):
+    """Change the style WITHOUT changing updated_at: picking a style is not new activity,
+    so the conversation should not jump to the top of the sidebar."""
+    with _cursor() as cursor:
         cursor.execute(
-            "SELECT id, role, content, created_at FROM messages WHERE id = %s",
-            (message_id,),
+            "UPDATE conversations SET response_style = %s, updated_at = updated_at WHERE id = %s",
+            (response_style, conversation_id),
         )
-        return cursor.fetchone()

@@ -6,6 +6,16 @@ from pydantic import BaseModel, ConfigDict, Field
 
 MAX_MESSAGE_LENGTH = 4000
 
+ResponseStyle = Literal["short", "detailed", "simple"]
+
+
+class ConversationCreate(BaseModel):
+    response_style: ResponseStyle = "detailed"
+
+
+class StyleIn(BaseModel):
+    response_style: ResponseStyle
+
 
 class MessageIn(BaseModel):
     # Spaces at the start/end are removed first, so "   " counts as empty and is rejected.
@@ -29,7 +39,7 @@ class ConversationSummary(BaseModel):
 class ConversationOut(BaseModel):
     id: int
     title: str
-    response_style: Literal["short", "detailed", "simple"]
+    response_style: ResponseStyle
     created_at: datetime
     updated_at: datetime
 

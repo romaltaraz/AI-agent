@@ -2,7 +2,7 @@
   "info": {
     "name": "Hebrew AI Chat API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Run 'Create conversation' first - it saves conversationId for the other requests."
+    "description": "Run 'Create conversation' first - it saves conversationId for the other requests. 'Send message' creates the AI reply (and the title on the first reply)."
   },
   "variable": [
     {
@@ -189,6 +189,134 @@
             "conversations",
             "999999"
           ]
+        }
+      }
+    },
+    {
+      "name": "Create conversation (with response style)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "conversations"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"response_style\": \"short\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Change response style",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversations/{{conversationId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "conversations",
+            "{{conversationId}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"response_style\": \"simple\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Regenerate latest answer / Retry failed reply",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversations/{{conversationId}}/regenerate",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "conversations",
+            "{{conversationId}}",
+            "regenerate"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Edit latest user message",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversations/{{conversationId}}/messages/last",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "conversations",
+            "{{conversationId}}",
+            "messages",
+            "last"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"ומה זה JavaScript? תענה במשפט אחד\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Change style - invalid value (expect 422)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversations/{{conversationId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "conversations",
+            "{{conversationId}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"response_style\": \"wrong\"\n}"
         }
       }
     },
