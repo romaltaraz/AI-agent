@@ -1,8 +1,8 @@
 {
   "info": {
     "name": "Hebrew AI Chat API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Run 'Create conversation' first - it saves conversationId for the other requests. 'Send message' creates the AI reply (and the title on the first reply)."
+    "description": "Run the requests in order (right-click the collection > Run). Request 2 saves conversationId for the others. The backend must be running on baseUrl.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
@@ -16,7 +16,7 @@
   ],
   "item": [
     {
-      "name": "Health check",
+      "name": "1. Health check",
       "request": {
         "method": "GET",
         "header": [],
@@ -29,11 +29,23 @@
             "api",
             "health"
           ]
+        },
+        "description": "Checks that the server is running and the database is reachable."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
         }
-      }
+      ]
     },
     {
-      "name": "Create conversation",
+      "name": "2. Create conversation",
       "request": {
         "method": "POST",
         "header": [],
@@ -46,7 +58,8 @@
             "api",
             "conversations"
           ]
-        }
+        },
+        "description": "Creates an empty conversation (default style: detailed) and saves its id in the variable conversationId."
       },
       "event": [
         {
@@ -54,6 +67,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
+              "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
               "pm.collectionVariables.set('conversationId', pm.response.json().id);"
             ]
           }
@@ -61,7 +75,7 @@
       ]
     },
     {
-      "name": "List conversations",
+      "name": "3. List conversations",
       "request": {
         "method": "GET",
         "header": [],
@@ -74,11 +88,23 @@
             "api",
             "conversations"
           ]
+        },
+        "description": "Conversations that have at least one message, newest activity first."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
         }
-      }
+      ]
     },
     {
-      "name": "Search conversations by title",
+      "name": "4. Search conversations by title",
       "request": {
         "method": "GET",
         "header": [],
@@ -97,11 +123,23 @@
               "value": "שיחה"
             }
           ]
+        },
+        "description": "Optional ?search= filters the list by title."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
         }
-      }
+      ]
     },
     {
-      "name": "Get conversation with messages",
+      "name": "5. Get conversation with messages",
       "request": {
         "method": "GET",
         "header": [],
@@ -115,11 +153,23 @@
             "conversations",
             "{{conversationId}}"
           ]
+        },
+        "description": "The conversation details and all its messages in order."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
         }
-      }
+      ]
     },
     {
-      "name": "Send message",
+      "name": "6. Send message",
       "request": {
         "method": "POST",
         "header": [
@@ -140,14 +190,26 @@
             "messages"
           ]
         },
+        "description": "Saves the user message, asks the AI (latest 30 messages as context), saves and returns the AI reply. The first reply of a conversation also creates its title.",
         "body": {
           "mode": "raw",
           "raw": "{\n  \"content\": \"שלום! תסביר לי במשפט אחד מה זה FastAPI\"\n}"
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201', function () { pm.response.to.have.status(201); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "Send message - empty (expect 422)",
+      "name": "7. Send message - empty text (expect 422)",
       "request": {
         "method": "POST",
         "header": [
@@ -168,14 +230,26 @@
             "messages"
           ]
         },
+        "description": "Validation: an empty or whitespace-only message is rejected and nothing is saved.",
         "body": {
           "mode": "raw",
           "raw": "{\n  \"content\": \"   \"\n}"
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 422', function () { pm.response.to.have.status(422); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "Get missing conversation (expect 404)",
+      "name": "8. Get missing conversation (expect 404)",
       "request": {
         "method": "GET",
         "header": [],
@@ -189,37 +263,23 @@
             "conversations",
             "999999"
           ]
-        }
-      }
-    },
-    {
-      "name": "Create conversation (with response style)",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/conversations",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "conversations"
-          ]
         },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"response_style\": \"short\"\n}"
+        "description": "A conversation that does not exist returns a clear 404."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
         }
-      }
+      ]
     },
     {
-      "name": "Change response style",
+      "name": "9. Change response style",
       "request": {
         "method": "PATCH",
         "header": [
@@ -239,14 +299,65 @@
             "{{conversationId}}"
           ]
         },
+        "description": "Allowed values: short, detailed, simple. Applies to future answers only; old messages are not changed.",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"response_style\": \"simple\"\n}"
+          "raw": "{\n  \"response_style\": \"short\"\n}"
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "Regenerate latest answer / Retry failed reply",
+      "name": "10. Change style - invalid value (expect 422)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversations/{{conversationId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "conversations",
+            "{{conversationId}}"
+          ]
+        },
+        "description": "An unknown style is rejected.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"response_style\": \"wrong\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 422', function () { pm.response.to.have.status(422); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Regenerate latest answer",
       "request": {
         "method": "POST",
         "header": [],
@@ -261,11 +372,23 @@
             "{{conversationId}}",
             "regenerate"
           ]
+        },
+        "description": "Asks the AI again WITHOUT the old answer; the old answer is deleted only after the new one succeeds. If the latest message is a user message with no reply (a failed request), this same call is the retry and creates the missing answer. It never adds another user message."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
         }
-      }
+      ]
     },
     {
-      "name": "Edit latest user message",
+      "name": "12. Edit latest user message",
       "request": {
         "method": "PUT",
         "header": [
@@ -287,41 +410,26 @@
             "last"
           ]
         },
+        "description": "Replaces the latest user message (and the answer after it) with the new text and returns the updated conversation including a new AI answer.",
         "body": {
           "mode": "raw",
           "raw": "{\n  \"content\": \"ומה זה JavaScript? תענה במשפט אחד\"\n}"
         }
-      }
-    },
-    {
-      "name": "Change style - invalid value (expect 422)",
-      "request": {
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
           }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/conversations/{{conversationId}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "conversations",
-            "{{conversationId}}"
-          ]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"response_style\": \"wrong\"\n}"
         }
-      }
+      ]
     },
     {
-      "name": "Delete conversation",
+      "name": "13. Delete conversation",
       "request": {
         "method": "DELETE",
         "header": [],
@@ -335,8 +443,89 @@
             "conversations",
             "{{conversationId}}"
           ]
+        },
+        "description": "Deletes the conversation and all its messages (ON DELETE CASCADE)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 204', function () { pm.response.to.have.status(204); });"
+            ]
+          }
         }
-      }
+      ]
+    },
+    {
+      "name": "14. Create conversation with a response style",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "conversations"
+          ]
+        },
+        "description": "The body is optional. Here the new conversation starts with the 'simple' style.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"response_style\": \"simple\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+              "pm.collectionVariables.set('conversationId', pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15. Delete conversation (cleanup)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversations/{{conversationId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "conversations",
+            "{{conversationId}}"
+          ]
+        },
+        "description": "Removes the conversation created in step 14."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 204', function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

@@ -475,4 +475,4 @@ At the end of every phase:
 * Do not claim something was tested unless you actually tested it.
 * Identify known limitations honestly.
 
-Every implemented API endpoint should eventually have a corresponding Postman request with example data.
+Every implemented API endpoint should eventually have a corresponding Postman request with example data. 

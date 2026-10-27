@@ -1,6 +1,7 @@
-fastapi
-uvicorn
-pydantic
-mysql-connector-python
-python-dotenv
-openai
+# Tested with Python 3.14. Versions are pinned so the project installs the same way everywhere.
+fastapi==0.162.0
+uvicorn==0.54.0
+pydantic==2.14.1
+mysql-connector-python==26.10.0
+python-dotenv==1.2.4
+openai==3.39.0
