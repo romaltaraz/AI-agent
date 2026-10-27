@@ -1,0 +1,53 @@
+.chat-input-wrap {
+  padding: 8px 16px 16px;
+}
+
+.chat-input {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: min(800px, 100%);
+  margin: 0 auto;
+  padding: 8px 8px 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.chat-input:focus-within {
+  border-color: var(--accent);
+}
+
+.chat-input textarea {
+  flex: 1;
+  max-height: 160px;
+  padding: 8px 6px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--text);
+}
+
+.send-button {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  transition: background 0.15s;
+}
+
+.send-button:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+/* The arrow icon points right by default; in a right-to-left page it should point left. */
+.send-button svg {
+  transform: scaleX(-1);
+}
