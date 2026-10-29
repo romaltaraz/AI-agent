@@ -2,20 +2,25 @@
 # You only fill in Backend/.env (copy it from Backend/.env.example).
 # The DB_* values below override the ones in that file, because inside Docker
 # the database is the "mysql" service, not localhost.
+# Port 3307 on your computer is also what a manually-run backend uses (DB_PORT=3307).
+# Password: "change_me" must match DB_PASSWORD in Backend/.env for the manual backend.
+# To change it, change it in this file everywhere: MYSQL_ROOT_PASSWORD, the healthcheck,
+# and the backend DB_PASSWORD.
 
 services:
   mysql:
     image: mysql:8
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
-      MYSQL_ROOT_PASSWORD: change_me # local-only password, same as in the README
+      MYSQL_ROOT_PASSWORD: change_me # local-only; must match DB_PASSWORD in Backend/.env (see top)
     ports:
-      - "3307:3306" # 3307 on your computer, so it never clashes with your own MySQL on 3306
+      - "3307:3306" # 3307 on your computer, a port other than MySQL's usual 3306, so it rarely clashes with a MySQL already installed
     volumes:
       - mysql_data:/var/lib/mysql
       # Loaded automatically, but ONLY on the very first start (while the volume is empty)
       - ./Database/ai_chat_export.sql:/docker-entrypoint-initdb.d/ai_chat_export.sql:ro
     healthcheck:
+      # password below (-pchange_me) must match MYSQL_ROOT_PASSWORD
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -pchange_me --silent"]
       interval: 5s
       timeout: 5s
@@ -26,6 +31,8 @@ services:
     build: ./Backend
     env_file: Backend/.env
     environment:
+      # These DB_* values override Backend/.env (inside Docker the DB is mysql:3306).
+      # DB_PASSWORD must equal MYSQL_ROOT_PASSWORD above.
       DB_HOST: mysql
       DB_PORT: "3306"
       DB_USER: root

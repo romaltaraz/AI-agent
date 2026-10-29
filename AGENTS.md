@@ -16,7 +16,7 @@ docker-compose.yml   mysql + backend + frontend
 ```
 
 ## Run and test
-Manual (needs a MySQL on localhost:3306, see README):
+Manual (needs the Compose MySQL: `docker compose up -d mysql`, on localhost:3307; see README):
 ```
 cd Backend && venv\Scripts\activate && uvicorn main:app --reload     # http://localhost:8000/api/health
 cd Frontend && npm run dev                                           # http://localhost:5173

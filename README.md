@@ -56,9 +56,9 @@ You need **Docker** and an **OpenAI API key**. Nothing else.
    ```
 4. Open http://localhost:5173.
 
-**One settings file for both ways of running.** You only ever fill in `Backend/.env`. Docker Compose reads it (`env_file`) and then replaces the database settings (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and `FRONTEND_ORIGIN` with the values for its own MySQL container. So the `DB_*` lines in that file only matter for the manual setup below, and you don't have to change them for Docker.
+**One settings file for both ways of running.** You only ever fill in `Backend/.env`. Docker Compose reads it (`env_file`) and then replaces the database settings (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and `FRONTEND_ORIGIN` with the values for its own MySQL container. So the `DB_*` lines in that file only matter for the manual setup below (the Compose MySQL on 3307), and you don't have to change them for Docker.
 
-**Ports:** the app is on 5173, the API on 8000 (docs at http://localhost:8000/docs), and the Compose MySQL is on **3307** on your computer, so it does not clash with a MySQL on 3306.
+**Ports:** the app is on 5173, the API on 8000 (docs at http://localhost:8000/docs), and the Compose MySQL is on **3307** on your computer (used by Docker and by the manual setup below).
 
 **Sample data:** on the very first start, MySQL loads `Database/ai_chat_export.sql` automatically, so you see 8 sample conversations. This happens **only once**, while the database volume is empty. Later starts keep your data (including your own new chats) and do not reload the sample file.
 
@@ -66,31 +66,17 @@ You need **Docker** and an **OpenAI API key**. Nothing else.
 
 ## Manual setup
 
-You need: **Python 3.14** (what it was tested with), **Node.js 24**, **Docker** (or any MySQL 8 server), and an **OpenAI API key**.
+You need: **Python 3.14** (what it was tested with), **Node.js 24**, **Docker**, and an **OpenAI API key**.
 
 ### 1. Database
 
-Start MySQL in Docker (the password here must match `DB_PASSWORD` in `Backend/.env`):
+Start the MySQL from Docker Compose (it listens on port **3307**, and loads the sample data automatically on the first start):
 
 ```
-docker run --name ai-chat-mysql -e MYSQL_ROOT_PASSWORD=change_me -p 3306:3306 -d mysql:8
+docker compose up -d mysql
 ```
 
-Wait about 20 seconds, then create the database. **Option A — empty database** (structure only):
-
-```
-docker cp Database/schema.sql ai-chat-mysql:/tmp/schema.sql
-docker exec ai-chat-mysql sh -c "mysql -uroot -pchange_me --default-character-set=utf8mb4 < /tmp/schema.sql"
-```
-
-**Option B — database with sample conversations** (structure + data):
-
-```
-docker cp Database/ai_chat_export.sql ai-chat-mysql:/tmp/ai_chat_export.sql
-docker exec ai-chat-mysql sh -c "mysql -uroot -pchange_me --default-character-set=utf8mb4 < /tmp/ai_chat_export.sql"
-```
-
-(Use either option, not both. Option B replaces the tables if they already exist.)
+Have your own MySQL server instead? Change `DB_HOST`/`DB_PORT`/`DB_PASSWORD` in `Backend/.env` and import `Database/schema.sql` (empty) or `Database/ai_chat_export.sql` (sample data) yourself.
 
 ### 2. Backend
 
@@ -127,7 +113,7 @@ Open http://localhost:5173.
 
 | Variable | Meaning |
 |---|---|
-| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | MySQL connection for the manual setup (defaults match the Docker command above). Docker Compose overrides these |
+| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | MySQL connection for the manual setup. Defaults point to the Compose MySQL (`localhost`, port `3307`, password `change_me`). Full Docker (`docker compose up`) overrides all of these |
 | `FRONTEND_ORIGIN` | The only origin allowed by CORS (default `http://localhost:5173`) |
 | `OPENAI_API_KEY` | Your OpenAI key. Never commit it; `.env` is in `.gitignore` |
 | `OPENAI_MODEL` | The model name used for answers and titles |
