@@ -4,7 +4,7 @@ Run this in **PowerShell** from anywhere. It copies the project into a temporary
 
 ```powershell
 $src  = "C:\Users\Rom\Documents\visual- john bryce\AI-agent"
-$name = "Rom Altaraz"                       # the root folder name, in English
+$name = "Rom Altaraz"
 $tmp  = "$env:TEMP\zipbuild"
 $zip  = "$([Environment]::GetFolderPath('Desktop'))\$name.zip"
 
@@ -14,7 +14,7 @@ tar.exe -a -c -f $zip -C $tmp $name
 Remove-Item $tmp -Recurse -Force
 ```
 
-(`robocopy` prints exit codes 0-7 for success, so ignore a "failed" look in some terminals.)
+(`$name` is the root folder name of the zip, in English.) (`robocopy` prints exit codes 0-7 for success, so ignore a "failed" look in some terminals.)
 
 ## What is inside
 

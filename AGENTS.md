@@ -16,17 +16,35 @@ docker-compose.yml   mysql + backend + frontend + phpMyAdmin (port 8080, root / 
 ```
 
 ## Run and test
-Manual (needs the Compose MySQL: `docker compose up -d mysql`, on localhost:3307; see README):
+Manual (needs the Compose MySQL on localhost:3307; see README). From the project root, in PowerShell:
 ```
-cd Backend && venv\Scripts\activate && uvicorn main:app --reload     # http://localhost:8000/api/health
-cd Frontend && npm run dev                                           # http://localhost:5173
-cd Frontend && npm run lint && npm run build
+docker compose up -d mysql
+cd Backend
+venv\Scripts\activate
+uvicorn main:app --reload
 ```
-Docker (reads `Backend/.env`; overrides the DB settings itself):
+Backend health check: http://localhost:8000/api/health. Frontend, in a second terminal from the project root (http://localhost:5173):
 ```
-docker compose up --build        # app on http://localhost:5173, MySQL on host port 3307, phpMyAdmin on http://localhost:8080
-docker compose down              # stop, keep the data
-docker compose down -v           # stop and reset the database
+cd Frontend
+npm run dev
+```
+Lint and build:
+```
+cd Frontend
+npm run lint
+npm run build
+```
+Docker (reads `Backend/.env`; overrides the DB settings itself). App on http://localhost:5173, MySQL on host port 3307, phpMyAdmin on http://localhost:8080:
+```
+docker compose up --build
+```
+Stop and keep the data:
+```
+docker compose down
+```
+Stop and reset the database:
+```
+docker compose down -v
 ```
 API check: import `Backend/postman_collection.json` into Postman and run it in order (it cleans up after itself).
 There is no automated test suite. Verify changes by running the app. Never claim something was tested if it was not.

@@ -53,14 +53,23 @@ Every command in this README must be run from the **project root**: the folder t
 - If you **downloaded the ZIP from GitHub**, Windows may extract it into a nested folder, for example `Downloads\AI-agent-main\AI-agent-main`. Go into the **INNER** folder.
 - If you **cloned with git**, the folder is named after the repository.
 
+Windows (PowerShell):
+
 ```
 cd Downloads\AI-agent-main\AI-agent-main
 dir
 ```
 
-`dir` (macOS/Linux: `ls`) must show `docker-compose.yml`, `Backend`, `Frontend` and `Database`. If it doesn't, you are in the wrong folder.
+macOS / Linux:
 
-**Every new terminal starts in a different folder, not in the project.** So each time you open a new terminal, first `cd` to the project root (the inner folder for a ZIP), for example:
+```
+cd Downloads/AI-agent-main/AI-agent-main
+ls
+```
+
+The listing must show `docker-compose.yml`, `Backend`, `Frontend` and `Database`. If it doesn't, you are in the wrong folder.
+
+**Every new terminal starts in a different folder, not in the project.** So each time you open a new terminal, first `cd` to the project root (the inner folder for a ZIP), for example (replace `<you>` with your Windows user name):
 
 ```
 cd C:\Users\<you>\Downloads\AI-agent-main\AI-agent-main
@@ -70,9 +79,15 @@ cd C:\Users\<you>\Downloads\AI-agent-main\AI-agent-main
 
 You need **Docker** and an **OpenAI API key**. Nothing else.
 
-1. Create your settings file:
+1. Create your settings file (do this only **once**; running it again overwrites your `.env` and your key).
+
+   Windows (PowerShell):
    ```
-   copy Backend\.env.example Backend\.env        (macOS/Linux: cp Backend/.env.example Backend/.env)
+   copy Backend\.env.example Backend\.env
+   ```
+   macOS / Linux:
+   ```
+   cp Backend/.env.example Backend/.env
    ```
 2. In `Backend/.env`, set **only** `OPENAI_API_KEY` (and `OPENAI_MODEL` if needed; a model your account can use, the project was built with `gpt-6-luna`). **Do not change the `DB_*` values.**
 3. Start everything:
@@ -109,12 +124,38 @@ Have your own MySQL server instead? Change `DB_HOST`/`DB_PORT`/`DB_PASSWORD` in 
 
 Open a terminal in the project root first (see Step 0), then:
 
+Windows (PowerShell):
+
 ```
 cd Backend
 python -m venv venv
-venv\Scripts\activate            (macOS/Linux: source venv/bin/activate)
+venv\Scripts\activate
+```
+
+macOS / Linux:
+
+```
+cd Backend
+python3 -m venv venv
+source venv/bin/activate
+```
+
+You should now see `(venv)` at the start of the line. If you don't, the next `pip` command will fail, so fix this first (see Troubleshooting).
+
+Install the packages and create your settings file (do the settings file only **once**; running it again overwrites your `.env` and your key).
+
+Windows (PowerShell):
+
+```
 pip install -r requirements.txt
-copy .env.example .env           (macOS/Linux: cp .env.example .env)
+copy .env.example .env
+```
+
+macOS / Linux:
+
+```
+pip install -r requirements.txt
+cp .env.example .env
 ```
 
 Open `Backend/.env` and set **only** `OPENAI_API_KEY` (and `OPENAI_MODEL` if needed). **Do not change the `DB_*` values.** They match the Docker Compose MySQL. Then start the server:
@@ -130,8 +171,19 @@ The interactive API docs are at http://localhost:8000/docs.
 
 Open a **second terminal**. It does not start in the project folder, so go to the project root first (the inner folder for a ZIP), then into `Frontend`:
 
+Windows (PowerShell):
+
 ```
-cd C:\Users\<you>\Downloads\AI-agent-main\AI-agent-main
+cd AI-agent-main
+cd Frontend
+npm install
+npm run dev
+```
+
+macOS / Linux:
+
+```
+cd AI-agent-main
 cd Frontend
 npm install
 npm run dev
@@ -183,6 +235,12 @@ A ready-made **Postman collection** with an example and an automatic status test
 - **"no configuration file provided"**: you are not in the folder that contains `docker-compose.yml`. See Step 0 (a GitHub ZIP is often nested, so go into the inner folder).
 - **"cannot connect to the Docker daemon" (or similar Docker errors)**: Docker Desktop is not running. Start Docker Desktop and wait until it says it is ready, then try again.
 - **`cd Frontend` / `cd Backend`: "cannot find path"**: you are not in the project root. `cd` to the full path of the project folder first (the inner folder for a ZIP, e.g. `cd C:\Users\<you>\Downloads\AI-agent-main\AI-agent-main`), then `cd Frontend`.
+- **"pip / uvicorn is not recognized"**: the virtual environment is not active (you don't see `(venv)` at the start of the line). Run the activate command again, alone on its line.
+- **"running scripts is disabled on this system"** (PowerShell blocks `activate`): run this once, then activate again:
+  ```
+  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+  ```
+- **Your key disappeared from `Backend/.env`**: running `copy .env.example .env` again overwrites your `.env`. Do it only once.
 - **"Access denied for user 'root'"**: `DB_PASSWORD` in `Backend/.env` must be `change_me`. Don't change the `DB_*` values.
 - **`localhost:3307` doesn't open in the browser**: MySQL is not a website. Use MySQL Workbench (host `127.0.0.1`, port `3307`, user `root`, password `change_me`), or open phpMyAdmin at http://localhost:8080 (see below).
 - **Port 8000, 5173, 3307 or 8080 is already in use**: stop the other program using that port first.
@@ -190,7 +248,7 @@ A ready-made **Postman collection** with an example and an automatic status test
 
 ## Viewing the database in the browser (optional)
 
-`docker compose up` also starts **phpMyAdmin**. Open http://localhost:8080 (it logs in automatically as `root` / `change_me`) and choose the `ai_chat` database. If you only ran `docker compose up -d mysql` (manual setup), start it with `docker compose up -d phpmyadmin`. If you only run `docker compose up -d mysql`, start it with `docker compose up -d phpmyadmin`.
+`docker compose up` also starts **phpMyAdmin**. Open http://localhost:8080 (it logs in automatically as `root` / `change_me`) and choose the `ai_chat` database. If you only ran `docker compose up -d mysql` (manual setup), start it with `docker compose up -d phpmyadmin`.
 
 ## Credits
 
