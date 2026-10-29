@@ -27,6 +27,19 @@ services:
       retries: 30
       start_period: 20s
 
+  # Optional: view the database in the browser at http://localhost:8080 (root / change_me)
+  phpmyadmin:
+    image: phpmyadmin:5
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: change_me # must match MYSQL_ROOT_PASSWORD
+    ports:
+      - "8080:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   backend:
     build: ./Backend
     env_file: Backend/.env
