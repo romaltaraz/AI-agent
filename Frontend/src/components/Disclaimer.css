@@ -1,0 +1,17 @@
+.disclaimer {
+  margin: 8px auto 0;
+  max-width: 800px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* On small phones: tighter, so the input stays on screen */
+@media (max-width: 480px) {
+  .disclaimer {
+    margin-top: 6px;
+    font-size: 0.6875rem;
+    line-height: 1.3;
+  }
+}

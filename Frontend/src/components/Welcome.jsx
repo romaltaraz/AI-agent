@@ -13,7 +13,7 @@ const EXAMPLE_PROMPTS = [
 export default function Welcome({ onPick, disabled }) {
   return (
     <div className="welcome">
-      {/* Decorative picture (an unDraw illustration): replace src/assets/illustrations/welcome.svg */}
+      {/* Decorative picture (a simple SVG): replace src/assets/illustrations/welcome.svg */}
       <img className="welcome-illustration" src={welcomeImage} alt="" />
       <h1>ברוכים הבאים ל{APP_NAME}</h1>
       <p>שאלו כל שאלה, או התחילו מאחת ההצעות:</p>

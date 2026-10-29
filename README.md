@@ -1,11 +1,13 @@
 # צ'אט-לי — Hebrew AI Chat
 
-A ChatGPT-style website with a complete Hebrew, right-to-left interface.
+A ChatGPT-style chat website with a complete Hebrew, right-to-left interface, built with React, FastAPI, MySQL and the OpenAI API.
 Final project for the **Full Stack & Gen AI** course at John Bryce, by Rom Altaraz.
 
-**GitHub repository:** https://github.com/USERNAME/hebrew-ai-chat
+**GitHub repository:** https://github.com/romaltaraz/AI-agent
 
-## What it does
+![Chat page](docs/screenshots/chat-desktop.png)
+
+## Features
 
 - Chat with an AI assistant; every conversation is saved in MySQL and continues with its previous context.
 - Sidebar with all saved conversations (newest activity first), search by title, and delete with a confirmation dialog.
@@ -13,7 +15,11 @@ Final project for the **Full Stack & Gen AI** course at John Bryce, by Rom Altar
 - Choose a response style per conversation: short, detailed, or simple.
 - Automatic short Hebrew title for each new conversation.
 - AI answers are rendered as Markdown. Every paragraph and list item gets its own text direction, and code blocks are left-to-right with a copy button.
-- Responsive layout (the sidebar becomes a drawer on phones) and an About page.
+- Responsive layout (the sidebar becomes a drawer on phones) and a designed About page.
+
+| Welcome screen | Mobile | About page |
+|---|---|---|
+| <img src="docs/screenshots/welcome-desktop.png" width="300"> | <img src="docs/screenshots/chat-mobile.png" width="150"> | <img src="docs/screenshots/about-desktop.png" width="300"> |
 
 ## Tech stack
 
@@ -27,12 +33,38 @@ Final project for the **Full Stack & Gen AI** course at John Bryce, by Rom Altar
 ## Project structure
 
 ```
-Backend/    FastAPI app + postman_collection.json
-Frontend/   React app
-Database/   schema.sql (structure only) and ai_chat_export.sql (structure + sample data)
+Backend/              FastAPI app, Dockerfile, postman_collection.json
+Frontend/             React app, Dockerfile
+Database/             schema.sql (structure only) and ai_chat_export.sql (structure + sample data)
+docs/screenshots/     Pictures used in this README
+docker-compose.yml    mysql + backend + frontend, started with one command
+AGENTS.md             Short guide for AI coding agents
 ```
 
-## Setup
+## Quick start with Docker
+
+You need **Docker** and an **OpenAI API key**. Nothing else.
+
+1. Create your settings file:
+   ```
+   copy Backend\.env.example Backend\.env        (macOS/Linux: cp Backend/.env.example Backend/.env)
+   ```
+2. In `Backend/.env`, set `OPENAI_API_KEY` and `OPENAI_MODEL` (a model your account can use; the project was built with `gpt-6-luna`).
+3. Start everything:
+   ```
+   docker compose up --build
+   ```
+4. Open http://localhost:5173.
+
+**One settings file for both ways of running.** You only ever fill in `Backend/.env`. Docker Compose reads it (`env_file`) and then replaces the database settings (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and `FRONTEND_ORIGIN` with the values for its own MySQL container. So the `DB_*` lines in that file only matter for the manual setup below, and you don't have to change them for Docker.
+
+**Ports:** the app is on 5173, the API on 8000 (docs at http://localhost:8000/docs), and the Compose MySQL is on **3307** on your computer, so it does not clash with a MySQL on 3306.
+
+**Sample data:** on the very first start, MySQL loads `Database/ai_chat_export.sql` automatically, so you see 8 sample conversations. This happens **only once**, while the database volume is empty. Later starts keep your data (including your own new chats) and do not reload the sample file.
+
+**Reset the database:** `docker compose down -v` stops everything and deletes the database volume. The next `docker compose up` loads the sample data again. (`docker compose down` without `-v` keeps your data.)
+
+## Manual setup
 
 You need: **Python 3.14** (what it was tested with), **Node.js 24**, **Docker** (or any MySQL 8 server), and an **OpenAI API key**.
 
@@ -70,7 +102,7 @@ pip install -r requirements.txt
 copy .env.example .env           (macOS/Linux: cp .env.example .env)
 ```
 
-Open `Backend/.env` and set `OPENAI_API_KEY` and `OPENAI_MODEL` (a model your account can use; the project was built with `gpt-6-luna`). Then start the server:
+Open `Backend/.env` and set `OPENAI_API_KEY` and `OPENAI_MODEL`. Then start the server:
 
 ```
 uvicorn main:app --reload
@@ -95,7 +127,7 @@ Open http://localhost:5173.
 
 | Variable | Meaning |
 |---|---|
-| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | MySQL connection (defaults match the Docker command above) |
+| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | MySQL connection for the manual setup (defaults match the Docker command above). Docker Compose overrides these |
 | `FRONTEND_ORIGIN` | The only origin allowed by CORS (default `http://localhost:5173`) |
 | `OPENAI_API_KEY` | Your OpenAI key. Never commit it; `.env` is in `.gitignore` |
 | `OPENAI_MODEL` | The model name used for answers and titles |
@@ -126,11 +158,11 @@ A ready-made **Postman collection** with an example and an automatic status test
 
 ## Customizing
 
-- App name: `APP_NAME` in `Frontend/src/config.js`.
+- App name and the small "I may make mistakes" note: `APP_NAME` and `DISCLAIMER_TEXT` in `Frontend/src/config.js`.
 - About page details and links: `PROFILE` at the top of `Frontend/src/components/about/AboutMeCard.jsx`.
 - Illustrations: `Frontend/src/assets/illustrations/`.
 
 ## Credits
 
-Illustrations from [unDraw](https://undraw.co/license). Brand logos from [Simple Icons](https://simpleicons.org) (CC0); the names and logos belong to their owners.
+Illustrations are original simple SVGs made for this project. Brand logos from [Simple Icons](https://simpleicons.org) (CC0); the names and logos belong to their owners.
 Icons from [Lucide](https://lucide.dev). Font: Heebo (Google Fonts).

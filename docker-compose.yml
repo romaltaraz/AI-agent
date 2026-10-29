@@ -1,0 +1,52 @@
+# Runs the whole app with one command:  docker compose up --build
+# You only fill in Backend/.env (copy it from Backend/.env.example).
+# The DB_* values below override the ones in that file, because inside Docker
+# the database is the "mysql" service, not localhost.
+
+services:
+  mysql:
+    image: mysql:8
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: change_me # local-only password, same as in the README
+    ports:
+      - "3307:3306" # 3307 on your computer, so it never clashes with your own MySQL on 3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Loaded automatically, but ONLY on the very first start (while the volume is empty)
+      - ./Database/ai_chat_export.sql:/docker-entrypoint-initdb.d/ai_chat_export.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -pchange_me --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  backend:
+    build: ./Backend
+    env_file: Backend/.env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASSWORD: change_me
+      DB_NAME: ai_chat
+      FRONTEND_ORIGIN: http://localhost:5173
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ./Frontend
+    environment:
+      # The browser (not the container) calls the API, so this is the published backend port
+      VITE_API_URL: http://localhost:8000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

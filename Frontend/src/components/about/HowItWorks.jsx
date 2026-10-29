@@ -37,7 +37,7 @@ export default function HowItWorks() {
             שומר גם אותה ומחזיר אותה אליכם. מפתח ה-API נשאר בשרת בלבד.
           </p>
         </div>
-        {/* Decorative picture (an unDraw illustration): replace src/assets/illustrations/how-it-works.svg */}
+        {/* Decorative picture (a simple SVG): replace src/assets/illustrations/how-it-works.svg */}
         <img src={howItWorksImage} alt="" />
       </div>
 

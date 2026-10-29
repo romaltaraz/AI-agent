@@ -2,13 +2,13 @@ import { User } from "lucide-react";
 import { GitHubIcon, LinkedInIcon } from "../icons/BrandIcons";
 import "./AboutMeCard.css";
 
-// TODO: replace the placeholders below with your real details.
-// While a link is empty, its button shows as "link will be added" and does nothing.
+// The details shown on the About Me card. To change them, edit this object.
+// If a link is left empty, its button shows as "link will be added" and does nothing.
 const PROFILE = {
-  name: "[השם שלי]",
-  bio: "[כאן יבוא תיאור קצר עליי: מי אני, מה אני לומד ומה אני אוהב לבנות.]",
-  github: "", // e.g. "https://github.com/your-name"
-  linkedin: "", // e.g. "https://www.linkedin.com/in/your-name"
+  name: "רום אלטרץ",
+  bio: "סטודנטית להנדסת תעשייה וניהול באוניברסיטת בן־גוריון, עם רקע בפיתוח Full Stack ובבינה מלאכותית יוצרת. הפרויקט הזה משלב בין הידע שרכשתי במהלך הלימודים לבין הרצון שלי לבנות אפליקציות שימושיות ונוחות למשתמש.",
+  github: "https://github.com/romaltaraz",
+  linkedin: "https://www.linkedin.com/in/rom-altaraz-700533176/",
 };
 
 function ProfileLink({ url, label, icon: Icon }) {

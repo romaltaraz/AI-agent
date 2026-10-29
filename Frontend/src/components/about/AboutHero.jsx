@@ -12,7 +12,7 @@ export default function AboutHero() {
           אתר צ'אט עם בינה מלאכותית בעברית. השיחות נשמרות, ההקשר נשמר, והתשובות מעוצבות ונעימות לקריאה.
         </p>
       </div>
-      {/* Decorative picture (an unDraw illustration): replace src/assets/illustrations/about-hero.svg */}
+      {/* Decorative picture (a simple SVG): replace src/assets/illustrations/about-hero.svg */}
       <img src={heroImage} alt="" />
     </section>
   );

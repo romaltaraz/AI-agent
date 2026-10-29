@@ -3,6 +3,7 @@ import AboutMeCard from "../components/about/AboutMeCard";
 import FeatureCards from "../components/about/FeatureCards";
 import TechSection from "../components/about/TechSection";
 import HowItWorks from "../components/about/HowItWorks";
+import Disclaimer from "../components/Disclaimer";
 import "./About.css";
 
 export default function About() {
@@ -14,6 +15,7 @@ export default function About() {
         <FeatureCards />
         <TechSection />
         <HowItWorks />
+        <Disclaimer />
       </div>
     </div>
   );

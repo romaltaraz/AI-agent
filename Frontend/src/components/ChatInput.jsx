@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { SendHorizontal } from "lucide-react";
 import { MAX_MESSAGE_LENGTH } from "../config";
 import StyleSelector from "./StyleSelector";
+import Disclaimer from "./Disclaimer";
 import "./ChatInput.css";
 
 export default function ChatInput({ value, onChange, onSend, disabled, style, onStyleChange }) {
@@ -45,6 +46,7 @@ export default function ChatInput({ value, onChange, onSend, disabled, style, on
           <SendHorizontal size={20} />
         </button>
       </div>
+      <Disclaimer />
     </div>
   );
 }
