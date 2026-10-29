@@ -15,6 +15,8 @@ Final project for the **Full Stack & Gen AI** course at John Bryce, by Rom Altar
 - Choose a response style per conversation: short, detailed, or simple.
 - Automatic short Hebrew title for each new conversation.
 - AI answers are rendered as Markdown. Every paragraph and list item gets its own text direction, and code blocks are left-to-right with a copy button.
+- Welcome screen with clickable example prompts when no conversation is open.
+- A small note on every page reminding that the AI can make mistakes.
 - Responsive layout (the sidebar becomes a drawer on phones) and a designed About page.
 
 | Welcome screen | Mobile | About page |
@@ -29,6 +31,7 @@ Final project for the **Full Stack & Gen AI** course at John Bryce, by Rom Altar
 | Backend | Python, FastAPI, Pydantic, `openai`, `mysql-connector-python`, `python-dotenv` |
 | Database | MySQL 8 (plain parameterized SQL, no ORM) |
 | AI | OpenAI API, called **only** from the backend. The key lives in `Backend/.env` |
+| Tooling | Docker Compose (runs everything with one command), phpMyAdmin (view the database in the browser) |
 
 ## Project structure
 
@@ -37,7 +40,9 @@ Backend/              FastAPI app, Dockerfile, postman_collection.json
 Frontend/             React app, Dockerfile
 Database/             schema.sql (structure only) and ai_chat_export.sql (structure + sample data)
 docs/screenshots/     Pictures used in this README
-docker-compose.yml    mysql + backend + frontend, started with one command
+docs/SUBMISSION.md    Final submission checklist
+docker-compose.yml    mysql + backend + frontend + phpMyAdmin, started with one command
+CLAUDE.md             Full project brief and working rules
 AGENTS.md             Short guide for AI coding agents
 ```
 
@@ -54,6 +59,12 @@ dir
 ```
 
 `dir` (macOS/Linux: `ls`) must show `docker-compose.yml`, `Backend`, `Frontend` and `Database`. If it doesn't, you are in the wrong folder.
+
+**Every new terminal starts in a different folder, not in the project.** So each time you open a new terminal, first `cd` to the project root (the inner folder for a ZIP), for example:
+
+```
+cd C:\Users\<you>\Downloads\AI-agent-main\AI-agent-main
+```
 
 ## Quick start with Docker
 
@@ -72,9 +83,11 @@ You need **Docker** and an **OpenAI API key**. Nothing else.
 
 **One settings file for both ways of running.** You only ever fill in `Backend/.env`. Docker Compose reads it (`env_file`) and then replaces the database settings (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) and `FRONTEND_ORIGIN` with the values for its own MySQL container. So the `DB_*` lines in that file only matter for the manual setup below (the Compose MySQL on 3307), and you don't have to change them for Docker.
 
-**Ports:** the app is on 5173, the API on 8000 (docs at http://localhost:8000/docs), and the Compose MySQL is on **3307** on your computer (used by Docker and by the manual setup below).
+**Ports:** the app is on 5173, the API on 8000 (docs at http://localhost:8000/docs), and the Compose MySQL is on **3307** on your computer (used by Docker and by the manual setup below). phpMyAdmin (the database in your browser) is on 8080.
 
 **Sample data:** on the very first start, MySQL loads `Database/ai_chat_export.sql` automatically, so you see 8 sample conversations. This happens **only once**, while the database volume is empty. Later starts keep your data (including your own new chats) and do not reload the sample file.
+
+**Stop without losing data:** press `Ctrl+C` in the terminal, then run `docker compose down`. Your conversations are kept for the next start.
 
 **Reset the database:** `docker compose down -v` stops everything and deletes the database volume. The next `docker compose up` loads the sample data again. (`docker compose down` without `-v` keeps your data.)
 
@@ -93,6 +106,8 @@ docker compose up -d mysql
 Have your own MySQL server instead? Change `DB_HOST`/`DB_PORT`/`DB_PASSWORD` in `Backend/.env` and import `Database/schema.sql` (empty) or `Database/ai_chat_export.sql` (sample data) yourself.
 
 ### 2. Backend
+
+Open a terminal in the project root first (see Step 0), then:
 
 ```
 cd Backend
@@ -113,9 +128,10 @@ The interactive API docs are at http://localhost:8000/docs.
 
 ### 3. Frontend
 
-In a second terminal:
+Open a **second terminal**. It does not start in the project folder, so go to the project root first (the inner folder for a ZIP), then into `Frontend`:
 
 ```
+cd C:\Users\<you>\Downloads\AI-agent-main\AI-agent-main
 cd Frontend
 npm install
 npm run dev
@@ -165,6 +181,8 @@ A ready-made **Postman collection** with an example and an automatic status test
 ## Troubleshooting
 
 - **"no configuration file provided"**: you are not in the folder that contains `docker-compose.yml`. See Step 0 (a GitHub ZIP is often nested, so go into the inner folder).
+- **"cannot connect to the Docker daemon" (or similar Docker errors)**: Docker Desktop is not running. Start Docker Desktop and wait until it says it is ready, then try again.
+- **`cd Frontend` / `cd Backend`: "cannot find path"**: you are not in the project root. `cd` to the full path of the project folder first (the inner folder for a ZIP, e.g. `cd C:\Users\<you>\Downloads\AI-agent-main\AI-agent-main`), then `cd Frontend`.
 - **"Access denied for user 'root'"**: `DB_PASSWORD` in `Backend/.env` must be `change_me`. Don't change the `DB_*` values.
 - **`localhost:3307` doesn't open in the browser**: MySQL is not a website. Use MySQL Workbench (host `127.0.0.1`, port `3307`, user `root`, password `change_me`), or open phpMyAdmin at http://localhost:8080 (see below).
 - **Port 8000, 5173, 3307 or 8080 is already in use**: stop the other program using that port first.
@@ -172,7 +190,7 @@ A ready-made **Postman collection** with an example and an automatic status test
 
 ## Viewing the database in the browser (optional)
 
-`docker compose up` also starts **phpMyAdmin**. Open http://localhost:8080 (it logs in automatically as `root` / `change_me`) and choose the `ai_chat` database. If you only run `docker compose up -d mysql`, start it with `docker compose up -d phpmyadmin`.
+`docker compose up` also starts **phpMyAdmin**. Open http://localhost:8080 (it logs in automatically as `root` / `change_me`) and choose the `ai_chat` database. If you only ran `docker compose up -d mysql` (manual setup), start it with `docker compose up -d phpmyadmin`. If you only run `docker compose up -d mysql`, start it with `docker compose up -d phpmyadmin`.
 
 ## Credits
 

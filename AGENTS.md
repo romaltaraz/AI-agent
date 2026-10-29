@@ -11,8 +11,8 @@ Backend/    FastAPI. main.py (app, CORS), routes.py (conversations), message_rou
             queries.py (ALL SQL), ai.py (OpenAI calls), schemas.py (Pydantic), database.py, postman_collection.json
 Frontend/   React + Vite. src/pages, src/components (each with its own .css), src/hooks (useChat, useConversationList), src/config.js
 Database/   schema.sql (structure only), ai_chat_export.sql (structure + sample data)
-docs/       README screenshots
-docker-compose.yml   mysql + backend + frontend
+docs/       README screenshots, SUBMISSION.md (final checklist)
+docker-compose.yml   mysql + backend + frontend + phpMyAdmin (port 8080, root / change_me)
 ```
 
 ## Run and test
@@ -24,7 +24,8 @@ cd Frontend && npm run lint && npm run build
 ```
 Docker (reads `Backend/.env`; overrides the DB settings itself):
 ```
-docker compose up --build        # app on http://localhost:5173, MySQL on host port 3307
+docker compose up --build        # app on http://localhost:5173, MySQL on host port 3307, phpMyAdmin on http://localhost:8080
+docker compose down              # stop, keep the data
 docker compose down -v           # stop and reset the database
 ```
 API check: import `Backend/postman_collection.json` into Postman and run it in order (it cleans up after itself).
